@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PayNow QR Code Generator</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h2>PayNow QR Code Generator</h2>
+ 
+  <p>This page generates a QR for your phone number, or for your UEN. Print it out and paste it wherever you run a hawker stall, pasar malam stall, or a garage sale!</p>
+  <div class="input-row">
+    
+    
+    <label>PayNow destination type:</label>
+    <input type="radio" name="type" id="typePhone" value="mobile" checked> Phone Number
+    <input type="radio" name="type" id="typeUEN" value="uen"> UEN
+  </div>
+  <div class="input-row" id="phoneRow">
+    <label for="phone">Phone Number</label>
+    <input type="text" id="phone" maxlength="12" placeholder="e.g. 91234567">
+  </div>
+  <div class="input-row" id="uenRow" style="display:none;">
+    <label for="uen">UEN</label>
+    <input type="text" id="uen" maxlength="20" placeholder="e.g. 201912345Z">
+  </div>
+  <div class="input-row">
+    <label for="amount">Amount (SGD)</label>
+    <input type="number" step="0.01" min="0" id="amount" placeholder="e.g. 10.00">
+  </div>
+  <div id="qrcode">
+    <div class="placeholder">Enter details to generate QR</div>
+  </div>
+  <button id="printBtn" disabled>Print QR</button>
+  <div class="note">
+    This QR follows <a href="https://www.abs.org.sg/docs/library/sgqr-specification-v1-7.pdf" target="_blank">SGQR spec</a>.
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
