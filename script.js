@@ -1,19 +1,22 @@
-function pad(n, width=2, z='0') { n = n + ''; return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n; }
+function pad(n, width = 2, z = '0') {
+  n = n + '';
+  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
 
-function makePaynowQR({type, value, amount}) {
+function makePaynowQR({ type, value, amount }) {
   let tags = [
-    { id: '00', value: '01' },
-    { id: '01', value: '12' },
-    { id: '26', value: [
+    { id: '00', value: '01' }, 
+    { id: '01', value: '12' },  
+    { id: '26', value: [       
       { id: '00', value: 'A000000727' },
-      { id: '01', value: type === "mobile" ? '0' : '2' },
-      { id: '02', value },
+      { id: '01', value: type === 'mobile' ? '0' : '2' },
+      { id: '02', value: value },                   
     ]},
     { id: '52', value: '0000' },
-    { id: '53', value: '702' },
-    ...(amount ? [{ id: '54', value: parseFloat(amount).toFixed(2) }] : []),
-    { id: '58', value: 'SG' },
-    { id: '59', value: 'PAYNOW' },
+    { id: '53', value: '702' },   
+    ...(amount ? [{ id: '54', value: parseFloat(amount).toFixed(2) }] : []), 
+    { id: '58', value: 'SG' },    
+    { id: '59', value: 'PAYNOW' },  
     { id: '60', value: 'Singapore' },
   ];
 
@@ -23,9 +26,10 @@ function makePaynowQR({type, value, amount}) {
     }
     return id + pad(value.length) + value;
   }
+
   let qr = tags.map(t => formatTag(t.id, t.value)).join('');
-  qr += '6304';
-  
+  qr += '6304'; 
+
   function crc16ccitt(str) {
     let crc = 0xFFFF;
     for (let c of str) {
@@ -48,17 +52,19 @@ function updateUI() {
   document.getElementById('phoneRow').style.display = (type === "mobile") ? '' : 'none';
   document.getElementById('uenRow').style.display = (type === "uen") ? '' : 'none';
   let isReady = false, qrData = "";
-  
+
   if (type === "mobile" && /^\d{8,12}$/.test(phone)) {
-    isReady = true; qrData = makePaynowQR({type, value: phone, amount});
+    isReady = true;
+    qrData = makePaynowQR({ type, value: phone, amount });
   }
   if (type === "uen" && /^[A-Z0-9]{8,20}$/.test(uen)) {
-    isReady = true; qrData = makePaynowQR({type, value: uen, amount});
+    isReady = true;
+    qrData = makePaynowQR({ type, value: uen, amount });
   }
-  
+
   const qrcodeDiv = document.getElementById('qrcode');
   qrcodeDiv.innerHTML = "";
-  
+
   if (isReady) {
     new QRCode(qrcodeDiv, {
       text: qrData,
@@ -71,9 +77,23 @@ function updateUI() {
   } else {
     qrcodeDiv.innerHTML = '<div class="placeholder">Enter details to generate QR</div>';
   }
-  
+
   document.getElementById('printBtn').disabled = !isReady;
+  document.getElementById('downloadBtn').disabled = !isReady;
+
+  if (isReady) {
+    const canvas = qrcodeDiv.querySelector('canvas');
+    document.getElementById('downloadBtn').onclick = function() {
+      if (canvas) {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL();
+        link.download = 'paynow_qr.png';
+        link.click();
+      }
+    }
+  }
 }
+
 ['phone', 'uen', 'amount'].forEach(id =>
   document.getElementById(id).addEventListener('input', updateUI));
 document.querySelectorAll('input[name="type"]').forEach(el =>
